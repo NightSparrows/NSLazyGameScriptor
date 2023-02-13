@@ -1,0 +1,2 @@
+# NSLazyGameScriptor
+ 
