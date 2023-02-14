@@ -7,11 +7,13 @@ from game.fgo.GameFGO import GameFGO
 from game.fgo.battle.Battle import Battle
 from game.fgo.tasks.DailyQPTask import DailyQPTask
 #from module.logger import logger
+from core.ADBDevice import ADBDevice
 
 if __name__ == '__main__':
 
     game = GameFGO()
     battle = Battle( 8, 'skadi', [True, False, True], 
+    #"skill 1 1\nskill 1 3\nskill 2 1\nskill 2 2 1\nskill 2 3 1\nskill 3 1\nskill 3 2 1\nskill 3 3 1\ncard c1 r r\ncard c1 r r\ncard c1 r r\n",
     "skill 2 3\ncard c2 r r\nskill 1 3 2\nskill 1 1 2\nskill 3 1 2\nskill 2 1\ncard c2 r r\nskill 3 3 2\ncard c2 r r\n",
     "")
     qpTask = DailyQPTask(game.m_stateManager, battle, 5)

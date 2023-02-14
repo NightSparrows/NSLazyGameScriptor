@@ -27,7 +27,7 @@ class ADBDevice:
 
     # capture the screen for operation
     def screenshot():
-        pipe = subprocess.Popen('\"' + ADBDevice.s_adbExePath + '\" shell screencap -p',
+        pipe = subprocess.Popen(ADBDevice.s_adbExePath + ' shell screencap -p',
                         stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE, shell=True)
         image_bytes = pipe.stdout.read().replace(b'\r\n', b'\n')
