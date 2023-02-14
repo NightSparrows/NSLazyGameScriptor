@@ -1,0 +1,4 @@
+settings/**
+__pycache__
+test.py
+**/__pycache__/

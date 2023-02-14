@@ -1,6 +1,7 @@
 
 import cv2
 import time
+import datetime
 
 from core.Logger import Logger
 from core.Task import Task
@@ -16,8 +17,8 @@ class DailyQPTask(Task):
     s_QPQuestBtnImage = cv2.imread('.//assets//fgo//task//dailyQP//QPBtn.png')
 
     # battle: 你的battle設定黨(class)
-    def __init__(self, stateManager: StateManager, battle: Battle, executeTime = 1) -> None:
-        super().__init__('DailyQP')
+    def __init__(self, date: datetime, stateManager: StateManager, battle: Battle, executeTime = 1) -> None:
+        super().__init__('DailyQP', date)
         self.m_stateManager = stateManager
         self.m_battle = battle
         self.m_executeTime = executeTime

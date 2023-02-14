@@ -1,6 +1,8 @@
 
 import cv2
 import time
+import json
+import datetime
 
 from game.fgo.GameFGO import GameFGO
 
@@ -12,6 +14,27 @@ from core.ADBDevice import ADBDevice
 if __name__ == '__main__':
 
     game = GameFGO()
+
+    f = open('settings/battle/1/data.json')
+
+    battleData = json.load(f)
+    f.close()
+
+    battle = Battle( battleData['partyNumber'],
+                    battleData['friendServantName'],
+                    battleData['skillRequirement'], 
+                    battleData['script'],
+    "")
+    qpTask = DailyQPTask(datetime.datetime.now(), game.m_stateManager, battle, 2)
+    game.restart()
+
+    qpTask.execute()
+
+    exit()
+    
+
+
+
     battle = Battle( 8, 'skadi', [True, False, True], 
     #"skill 1 1\nskill 1 3\nskill 2 1\nskill 2 2 1\nskill 2 3 1\nskill 3 1\nskill 3 2 1\nskill 3 3 1\ncard c1 r r\ncard c1 r r\ncard c1 r r\n",
     "skill 2 3\ncard c2 r r\nskill 1 3 2\nskill 1 1 2\nskill 3 1 2\nskill 2 1\ncard c2 r r\nskill 3 3 2\ncard c2 r r\n",
@@ -28,6 +51,21 @@ if __name__ == '__main__':
 
     #battle.inBattle()
     battle.execute(10)
+
+    exit()
+
+    battleData = {
+        'name': '測試戰鬥腳本',
+        'partyNumber': 8,
+        'friendServantName': 'skadi',
+        'skillRequirement': [True, False, True],
+        'script': "skill 2 3\ncard c2 r r\nskill 1 3 2\nskill 1 1 2\nskill 3 1 2\nskill 2 1\ncard c2 r r\nskill 3 3 2\ncard c2 r r\n"
+    }
+
+    jsonStr = json.dumps(battleData)
+    jsonFile = open('settings/battle/1/data.json', 'w')
+    jsonFile.write(jsonStr)
+    jsonFile.close()
 
     exit()
 

@@ -18,6 +18,14 @@ def window():
    widget.show()
    sys.exit(app.exec())
 
+# no gui main
 if __name__ == '__main__':
-    print(os.getcwd())
-    window()
+
+   running = True 
+    
+   
+   while running:
+
+      
+
+      pass
