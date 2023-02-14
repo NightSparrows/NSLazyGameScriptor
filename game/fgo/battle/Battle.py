@@ -11,6 +11,8 @@ from .BattleData import BattleData
 from .BattleUtil import BattleUtil
 from .Apple import Apple
 
+from ..assets import Assets
+
 class Battle:
 
     class Stage(Enum):
@@ -54,9 +56,9 @@ class Battle:
         inStage = False
         Logger.info('assert is in choose friend stage')
         for i in range(3):      # retry 3 time for checking it is in choose friend stage
-            time.sleep(2)
+            time.sleep(1)
             ADBDevice.screenshot()
-            result = ADBDevice.scan_screenshot(self.s_refreshBtnImage)
+            result = ADBDevice.scan_screenshot(Assets.chooseFriendIcon)
             if result['max_val'] > 0.9:
                 inStage = True
                 break
@@ -66,6 +68,7 @@ class Battle:
         
         # 選擇助戰職階
         classX = 90 + self.m_friendInfo['class'] * 68
+        Logger.info('choosing the correct classes ... ')
         for i in range(2):
             ADBDevice.tap(classX, 128)
             time.sleep(1)
@@ -73,58 +76,80 @@ class Battle:
         # Find servant
         foundServant = False
         Logger.info('Finding servant ... ')
-        for i in range(10):
-            # scan for servant
-            foundServant = False
-            time.sleep(1)
-            ADBDevice.screenshot()
-            result = ADBDevice.scan_screenshot(self.m_friendInfo['nameImage'])
-            if OpenCVUtil.isMatch(result):                        # found servant
-                Logger.info('Found servant!')
-                foundServant = True
-                # check the skill 
-                servantPosition = [result['max_loc'][0], result['max_loc'][1]]
-                skillLeft = servantPosition[0] + 460
-                skillTop = servantPosition[1]
-                skillImage = ADBDevice.getScreenshot()[skillTop:(skillTop + 105), skillLeft:(skillLeft + 300)]
-                #cv2.imshow("", skillImage)
-                #cv2.waitKey(0)
+        refreshCount = 0
+        while True:
+            for i in range(10):
+                # scan for servant
+                foundServant = False
+                time.sleep(1)
+                ADBDevice.screenshot()
+                result = ADBDevice.scan_screenshot(self.m_friendInfo['nameImage'])
+                if OpenCVUtil.isMatch(result):                        # found servant
+                    Logger.info('Found servant!')
+                    foundServant = True
+                    # check the skill 
+                    servantPosition = [result['max_loc'][0], result['max_loc'][1]]
+                    skillLeft = servantPosition[0] + 460
+                    skillTop = servantPosition[1]
+                    skillImage = ADBDevice.getScreenshot()[skillTop:(skillTop + 105), skillLeft:(skillLeft + 300)]
+                    #cv2.imshow("", skillImage)
+                    #cv2.waitKey(0)
 
 
-                if (self.m_skill[0] == True):
-                    Logger.info('Checking skill 1 ... ')
-                    result = OpenCVUtil.match(skillImage, self.m_friendInfo['skill1'])
-                    if (not OpenCVUtil.isMatch(result)):
-                        foundServant = False
-                    else:
-                        Logger.info('Skill 1 match!')
-                if (self.m_skill[1] == True):
-                    Logger.info('Checking skill 2 ... ')
-                    result = OpenCVUtil.match(skillImage, self.m_friendInfo['skill2'])
-                    if (not OpenCVUtil.isMatch(result)):
-                        foundServant = False    # 不符合找下一個
-                    else:
-                        Logger.info('Skill 2 match!')
-                if (self.m_skill[2] == True):
-                    Logger.info('Checking skill 3 ... ')
-                    result = OpenCVUtil.match(skillImage, self.m_friendInfo['skill3'])
-                    if (not OpenCVUtil.isMatch(result)):
-                        foundServant = False    # 不符合找下一個
-                    else:
-                        Logger.info('Skill 3 match!')
-                
-                # TODO 禮裝檢查
+                    if (self.m_skill[0] == True):
+                        Logger.info('Checking skill 1 ... ')
+                        result = OpenCVUtil.match(skillImage, self.m_friendInfo['skill1'])
+                        if (not OpenCVUtil.isMatch(result)):
+                            foundServant = False
+                        else:
+                            Logger.info('Skill 1 match!')
+                    if (self.m_skill[1] == True):
+                        Logger.info('Checking skill 2 ... ')
+                        result = OpenCVUtil.match(skillImage, self.m_friendInfo['skill2'])
+                        if (not OpenCVUtil.isMatch(result)):
+                            foundServant = False    # 不符合找下一個
+                        else:
+                            Logger.info('Skill 2 match!')
+                    if (self.m_skill[2] == True):
+                        Logger.info('Checking skill 3 ... ')
+                        result = OpenCVUtil.match(skillImage, self.m_friendInfo['skill3'])
+                        if (not OpenCVUtil.isMatch(result)):
+                            foundServant = False    # 不符合找下一個
+                        else:
+                            Logger.info('Skill 3 match!')
+                    
+                    # TODO 禮裝檢查
 
-                # Choose it!
-                if (foundServant):
-                    Logger.info('Servant ' + self.m_friendInfo['name'] + ' Found!')
-                    time.sleep(0.5)
-                    ADBDevice.tap(servantPosition[0], servantPosition[1])
-                    return True
+                    # Choose it!
+                    if (foundServant):
+                        Logger.info('Servant ' + self.m_friendInfo['name'] + ' Found!')
+                        time.sleep(0.5)
+                        ADBDevice.tap(servantPosition[0], servantPosition[1])
+                        return True
 
-            # 沒找到，scroll一個
-            ADBDevice.holdScroll(128, 610, 128, 450, 500)
-            time.sleep(1)
+                # 沒找到，scroll一個
+                ADBDevice.holdScroll(128, 610, 128, 450, 500)
+                time.sleep(1)
+            
+            # 沒找到，refresh
+            result = ADBDevice.scanAndRetry(Battle.s_refreshBtnImage, 3)
+            if result == None:
+                return False
+            else:
+                refreshCount += 1
+                point = OpenCVUtil.calculated(result, Battle.s_refreshBtnImage.shape)
+                ADBDevice.tap(point['x']['center'], point['y']['center'])
+                time.sleep(1)
+                # TODO OK button press
+                result = ADBDevice.scanAndRetry(Assets.OKBtnImage, 3)
+                if result != None:
+                    point = OpenCVUtil.calculated(result, Battle.s_refreshBtnImage.shape)
+                    ADBDevice.tap(point['x']['center'], point['y']['center'])
+                    time.sleep(1)        
+                if (refreshCount >= 5):
+                    Logger.error('You dont have friends?')
+                    return False
+            
 
         return False
 

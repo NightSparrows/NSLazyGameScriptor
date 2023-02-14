@@ -37,6 +37,18 @@ class ADBDevice:
     def getScreenshot():
         return ADBDevice.s_screenshot
 
+    def scanAndRetry(prepared, retryCount):
+        count = 0
+        while True:
+            if count >= retryCount:
+                return None
+            ADBDevice.screenshot()
+            result = ADBDevice.scan_screenshot(prepared)
+            if result['max_val'] > 0.9:
+                return result
+            count += 1
+            time.sleep(1)
+
     #scan the current screenshot for prepared image
     def scan_screenshot(prepared, method = cv2.TM_CCOEFF_NORMED):
         result = cv2.matchTemplate(ADBDevice.s_screenshot, prepared, method)

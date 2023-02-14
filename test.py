@@ -10,13 +10,18 @@ from game.fgo.battle.Battle import Battle
 
 if __name__ == '__main__':
 
-
     battle = Battle( 8, 'skadi', [True, False, True], 
     "skill 2 3\ncard c2 r r\nskill 1 3 2\nskill 1 1 2\nskill 3 1 2\nskill 2 1\ncard c2 r r\nskill 3 3 2\ncard c2 r r\n",
     "")
 
     #battle.inBattle()
-    battle.execute(20)
+    battle.execute(10)
+
+    exit()
+
+    game = GameFGO()
+    
+    game.restart()
 
     exit()
 
