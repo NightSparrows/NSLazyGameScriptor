@@ -262,7 +262,8 @@ class Battle:
                 Logger.info('戰鬥結束，完成第' + str(executeCount) + '次')
                 result = ADBDevice.WaitUntil(Battle.s_endDicisionImage, 5)
                 if result == None:
-                    raise NotImplementedError()
+                    Logger.error('無法找到結束確認視窗')
+                    return False
                 else:
                     if (executeCount == count):
                         self.m_endFlags = True

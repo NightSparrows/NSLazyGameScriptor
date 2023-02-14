@@ -1,9 +1,13 @@
 
+import datetime
 
 class Task:
 
-    def __init__(self, name: str) -> None:
+    # name: 工作名稱
+    # date: 下次要執行的日期
+    def __init__(self, name: str, date: datetime) -> None:
         self.m_name = name
+        self.m_date = date
         pass
 
     def execute(self):
@@ -11,3 +15,6 @@ class Task:
     
     def getName(self):
         return self.m_name
+
+    def getDate(self):
+        return self.m_date
