@@ -53,7 +53,7 @@ class GameFGO(Game):
         timer = 0
         loginPriceImage = cv2.imread('.//assets//fgo//state//lobby//loginPrice.png')
         Logger.info('確認是否有公告')
-        while timer <= 5:
+        while timer <= 3:
             ADBDevice.screenshot()
             screenshot = ADBDevice.getScreenshot()
             result = OpenCVUtil.match(screenshot[40:360, 300:1000], loginPriceImage)

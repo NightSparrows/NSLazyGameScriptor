@@ -8,3 +8,6 @@ class Task:
 
     def execute(self):
         raise NotImplementedError('Task ' + self.m_name + ' not impl.')
+    
+    def getName(self):
+        return self.m_name
