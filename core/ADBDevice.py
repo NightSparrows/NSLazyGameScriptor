@@ -13,7 +13,7 @@ class ADBDevice:
     s_maxValue = 0.91
     s_delay = 1
     s_screenshot = None
-    s_adbExePath = './/toolkits//adb//adb.exe'
+    s_adbExePath = '.\\toolkits\\adb\\adb.exe'
 
     def init() -> None:
         ADBDevice.s_maxValue = 0.93         # max value of matching
@@ -21,8 +21,8 @@ class ADBDevice:
         ADBDevice.screenshot()
     
     def screenshot_save():
-        subprocess.check_call([ADBDevice.s_adbExePath, "shell", "/system/bin/screencap", "-p", "/sdcard/screencap.png"])
-        subprocess.check_call([ADBDevice.s_adbExePath, "pull", "/sdcard/screencap.png", "./screencap.png"])
+        subprocess.check_output(ADBDevice.s_adbExePath + ' shell /system/bin/screencap -p /sdcard/screencap.png')
+        subprocess.check_output(ADBDevice.s_adbExePath + ' pull /sdcard/screencap.png ./screencap.png')
         return
 
     # capture the screen for operation
