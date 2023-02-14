@@ -50,8 +50,9 @@ class DailyQPTask(Task):
             time.sleep(1)
             
         if toBattle:
-            self.m_battle.execute(self.m_executeTime)
-            return True
+            if self.m_battle.execute(self.m_executeTime):
+                Logger.info('Daily QP task complete')
+                return True
         
         return False
 
