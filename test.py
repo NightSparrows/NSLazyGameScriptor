@@ -25,7 +25,7 @@ if __name__ == '__main__':
                     battleData['skillRequirement'], 
                     battleData['script'],
     "")
-    qpTask = DailyQPTask(datetime.datetime.now(), game.m_stateManager, battle, 2)
+    qpTask = DailyQPTask(datetime.datetime.now(), game.m_stateManager, battle, 5)
     game.restart()
 
     qpTask.execute()

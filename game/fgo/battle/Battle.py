@@ -143,7 +143,7 @@ class Battle:
                 # TODO OK button press
                 result = ADBDevice.scanAndRetry(Assets.OKBtnImage, 3)
                 if result != None:
-                    point = OpenCVUtil.calculated(result, Battle.s_refreshBtnImage.shape)
+                    point = OpenCVUtil.calculated(result, Assets.OKBtnImage.shape)
                     ADBDevice.tap(point['x']['center'], point['y']['center'])
                     time.sleep(1)        
                 if (refreshCount >= 5):
