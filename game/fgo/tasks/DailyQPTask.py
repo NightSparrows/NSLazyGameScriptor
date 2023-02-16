@@ -11,6 +11,7 @@ from core.StateManager import StateManager
 from utils.opencvUtil import OpenCVUtil
 
 from ..battle.Battle import Battle
+from ..battle.Apple import Apple
 
 class DailyQPTask(Task):
 
@@ -51,6 +52,7 @@ class DailyQPTask(Task):
             time.sleep(1)
             
         if toBattle:
+            Apple.checkAppleWindow()
             if self.m_battle.execute(self.m_executeTime):
                 Logger.info('Daily QP task complete')
                 return True
