@@ -15,25 +15,11 @@ if __name__ == '__main__':
 
     game = GameFGO()
 
-    f = open('settings/battle/1/data.json')
-
-    battleData = json.load(f)
-    f.close()
-
-    battle = Battle( battleData['partyNumber'],
-                    battleData['friendServantName'],
-                    battleData['skillRequirement'], 
-                    battleData['script'],
-    "")
-    qpTask = DailyQPTask(datetime.datetime.now(), game.m_stateManager, battle, 5)
     game.restart()
 
-    qpTask.execute()
+    game.m_tasks[0].execute()
 
     exit()
-    
-
-
 
     battle = Battle( 8, 'skadi', [True, False, True], 
     #"skill 1 1\nskill 1 3\nskill 2 1\nskill 2 2 1\nskill 2 3 1\nskill 3 1\nskill 3 2 1\nskill 3 3 1\ncard c1 r r\ncard c1 r r\ncard c1 r r\n",
@@ -51,6 +37,31 @@ if __name__ == '__main__':
 
     #battle.inBattle()
     battle.execute(10)
+
+    exit()
+
+    configData = {
+        'battle': [
+            {
+                'name': 'QuickParty',
+                'partyNumber': 8,
+                'friendServantName': 'skadi',
+                'skillRequirement': [True, False, True],
+                'script': "skill 2 3\ncard c2 r r\nskill 1 3 2\nskill 1 1 2\nskill 3 1 2\nskill 2 1\ncard c2 r r\nskill 3 3 2\ncard c2 r r\n"
+            }
+        ],
+        'QPTask':
+        {
+            'datetime': datetime.datetime.now().isoformat(),
+            'battleName': 'QuickParty',
+            'executionTime': 3
+        }
+    }
+    
+    jsonStr = json.dumps(configData)
+    jsonFile = open('settings/fgo/config.json', 'w')
+    jsonFile.write(jsonStr)
+    jsonFile.close()
 
     exit()
 

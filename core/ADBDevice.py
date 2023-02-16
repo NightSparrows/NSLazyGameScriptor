@@ -15,19 +15,21 @@ class ADBDevice:
     s_screenshot = None
     s_adbExePath = '.\\toolkits\\adb\\adb.exe'
 
+    s_connectEmulator = 'emulator-5554'
+
     def init() -> None:
         ADBDevice.s_maxValue = 0.93         # max value of matching
         ADBDevice.s_delay = 2               # delay capture screen time
         ADBDevice.screenshot()
     
     def screenshot_save():
-        subprocess.check_output(ADBDevice.s_adbExePath + ' shell /system/bin/screencap -p /sdcard/screencap.png')
-        subprocess.check_output(ADBDevice.s_adbExePath + ' pull /sdcard/screencap.png ./screencap.png')
+        subprocess.check_output(ADBDevice.s_adbExePath + ' -s ' + ADBDevice.s_connectEmulator + ' shell /system/bin/screencap -p /sdcard/screencap.png')
+        subprocess.check_output(ADBDevice.s_adbExePath + ' -s ' + ADBDevice.s_connectEmulator + ' pull /sdcard/screencap.png ./screencap.png')
         return
 
     # capture the screen for operation
     def screenshot():
-        pipe = subprocess.Popen(ADBDevice.s_adbExePath + ' shell screencap -p',
+        pipe = subprocess.Popen(ADBDevice.s_adbExePath + ' -s ' + ADBDevice.s_connectEmulator + ' shell screencap -p',
                         stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE, shell=True)
         image_bytes = pipe.stdout.read().replace(b'\r\n', b'\n')
@@ -86,25 +88,25 @@ class ADBDevice:
             counter += ADBDevice.s_delay
             
     def openApp(appName):
-        return subprocess.check_output([ADBDevice.s_adbExePath, "shell", "am", "start", "-n", appName])
+        return subprocess.check_output([ADBDevice.s_adbExePath,'-s', ADBDevice.s_connectEmulator, "shell", "am", "start", "-n", appName])
 
     def killApp(appName):
-        return subprocess.check_output([ADBDevice.s_adbExePath, "shell", "am", "force-stop", appName])
+        return subprocess.check_output([ADBDevice.s_adbExePath,'-s', ADBDevice.s_connectEmulator, "shell", "am", "force-stop", appName])
 
     # Tap the screen
     def tap(x, y):
-        subprocess.check_output('\"' + ADBDevice.s_adbExePath + '\" shell input tap %d %d' % (x, y), shell=True)
+        subprocess.check_output(ADBDevice.s_adbExePath + ' -s ' + ADBDevice.s_connectEmulator + ' shell input tap %d %d' % (x, y), shell=True)
 
     # Swipe the screen
     def swipe(x0, y0, x1, y1):
-        subprocess.check_output('\"' + ADBDevice.s_adbExePath + '\" shell input swipe %d %d %d %d' % (x0, y0, x1, y1), shell=True)
+        subprocess.check_output(ADBDevice.s_adbExePath + ' -s ' + ADBDevice.s_connectEmulator + ' shell input swipe %d %d %d %d' % (x0, y0, x1, y1), shell=True)
 
     # 長按
     # time in millisecond
     def hold(x, y, time):
-        subprocess.check_output('\"' + ADBDevice.s_adbExePath + '\" shell input swipe %d %d %d %d %d' % (x, y, x, y, time), shell=True)
+        subprocess.check_output(ADBDevice.s_adbExePath + ' -s ' + ADBDevice.s_connectEmulator + ' shell input swipe %d %d %d %d %d' % (x, y, x, y, time), shell=True)
 
     # 長按
     # time in millisecond
     def holdScroll(x0, y0, x1, y1, time):
-        subprocess.check_output('\"' + ADBDevice.s_adbExePath + '\" shell input swipe %d %d %d %d %d' % (x0, y0, x1, y1, time), shell=True)
+        subprocess.check_output(ADBDevice.s_adbExePath + ' -s ' + ADBDevice.s_connectEmulator + ' shell input swipe %d %d %d %d %d' % (x0, y0, x1, y1, time), shell=True)

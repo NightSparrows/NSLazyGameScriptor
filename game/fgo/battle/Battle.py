@@ -139,15 +139,20 @@ class Battle:
                 refreshCount += 1
                 point = OpenCVUtil.calculated(result, Battle.s_refreshBtnImage.shape)
                 ADBDevice.tap(point['x']['center'], point['y']['center'])
+
+                # TODO OK button press, 他是'是'
+                result = ADBDevice.scanAndRetry(Assets.YesBtnImage, 3)
                 time.sleep(1)
-                # TODO OK button press
-                result = ADBDevice.scanAndRetry(Assets.OKBtnImage, 3)
                 if result != None:
-                    point = OpenCVUtil.calculated(result, Assets.OKBtnImage.shape)
+                    point = OpenCVUtil.calculated(result, Assets.YesBtnImage.shape)
                     ADBDevice.tap(point['x']['center'], point['y']['center'])
-                    time.sleep(1)        
+                    Logger.info('click ok button')
+                    time.sleep(1) 
+                else:
+                    Logger.error('Press refresh dont have window.')
+                    return False       
                 if (refreshCount >= 5):
-                    Logger.error('You dont have friends?')
+                    Logger.error('Do you dont have friends?')
                     return False
             
 
@@ -261,6 +266,7 @@ class Battle:
                 executeCount += 1
                 Logger.info('戰鬥結束，完成第' + str(executeCount) + '次')
                 result = ADBDevice.WaitUntil(Battle.s_endDicisionImage, 5)
+                time.sleep(1)
                 if result == None:
                     Logger.error('無法找到結束確認視窗')
                     return False
