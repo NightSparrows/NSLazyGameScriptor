@@ -4,6 +4,8 @@ import time
 import json
 import datetime
 
+from core.ADBDevice import ADBDevice
+
 from game.fgo.GameFGO import GameFGO
 
 from game.fgo.battle.Battle import Battle

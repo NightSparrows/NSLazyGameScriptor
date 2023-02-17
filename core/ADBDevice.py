@@ -5,7 +5,12 @@ import subprocess
 import cv2
 import numpy
 import time
+import lz4.block
 
+import numpy as np
+
+
+from .Logger import Logger
 from utils.opencvUtil import OpenCVUtil
 
 class ADBDevice:
@@ -14,28 +19,70 @@ class ADBDevice:
     s_delay = 1
     s_screenshot = None
     s_adbExePath = '.\\toolkits\\adb\\adb.exe'
-
     s_connectEmulator = 'emulator-5554'
 
+    #s_screenCap = '/system/bin/screencap'
+    s_screenCap = '/data/local/tmp/ascreencap'
+
     def init() -> None:
+
+        subprocess.check_output(ADBDevice.s_adbExePath + ' -s ' + ADBDevice.s_connectEmulator + ' push toolkits/ascreenCap/x86_64/ascreencap /data/local/tmp')
+        subprocess.check_output(ADBDevice.s_adbExePath + ' -s ' + ADBDevice.s_connectEmulator + ' shell chmod 777 /data/local/tmp/ascreencap')
+
         ADBDevice.s_maxValue = 0.93         # max value of matching
         ADBDevice.s_delay = 2               # delay capture screen time
-        ADBDevice.screenshot()
+        #ADBDevice.screenshot()
     
     def screenshot_save():
-        subprocess.check_output(ADBDevice.s_adbExePath + ' -s ' + ADBDevice.s_connectEmulator + ' shell /system/bin/screencap -p /sdcard/screencap.png')
-        subprocess.check_output(ADBDevice.s_adbExePath + ' -s ' + ADBDevice.s_connectEmulator + ' pull /sdcard/screencap.png ./screencap.png')
+        subprocess.check_output(ADBDevice.s_adbExePath + ' -s ' + ADBDevice.s_connectEmulator + ' exec-out ' + ADBDevice.s_screenCap + ' -f /sdcard/screencap.bmz')
+        subprocess.check_output(ADBDevice.s_adbExePath + ' -s ' + ADBDevice.s_connectEmulator + ' pull /sdcard/screencap.bmz ./screencap.bmz')
         return
 
     # capture the screen for operation
     def screenshot():
-        pipe = subprocess.Popen(ADBDevice.s_adbExePath + ' -s ' + ADBDevice.s_connectEmulator + ' shell screencap -p',
-                        stdin=subprocess.PIPE,
+        #
+        pipe = subprocess.Popen(ADBDevice.s_adbExePath + ' -s ' + ADBDevice.s_connectEmulator + ' exec-out ' + ADBDevice.s_screenCap + ' --pack 2 --stdout',
                         stdout=subprocess.PIPE, shell=True)
-        image_bytes = pipe.stdout.read().replace(b'\r\n', b'\n')
-        image = cv2.imdecode(numpy.fromstring(image_bytes, numpy.uint8), cv2.IMREAD_COLOR)
-        ADBDevice.s_screenshot = image
+        #image_bytes = pipe.stdout.read().replace(b'\r\n', b'\n')
+        #image = cv2.imdecode(numpy.fromstring(image_bytes, numpy.uint8), cv2.IMREAD_COLOR)
+        #ADBDevice.s_screenshot = image
+        
+        data = pipe.stdout.read()
+        pipe.kill()
 
+        # See headers in:
+        # https://github.com/ClnViewer/Android-fast-screen-capture#streamimage-compressed---header-format-using
+        compressed_data_header = np.frombuffer(data[0:20], dtype=np.uint32)
+        
+        if compressed_data_header[0] != 828001602:
+            compressed_data_header = compressed_data_header.byteswap()
+            if compressed_data_header[0] != 828001602:
+                Logger.error('Failed to verify aScreenCap data header!')
+                return False
+        
+        _, uncompressed_size, _, width, height = compressed_data_header
+        channel = 3
+        decodeData = lz4.block.decompress(data[20:], uncompressed_size=uncompressed_size)
+
+        image = np.frombuffer(decodeData, dtype=np.uint8)
+        if image is None:
+            Logger.error('Empty image after reading from buffer')
+            return False
+        
+        try:
+            image = image[-int(width * height * channel):].reshape(height, width, channel)
+        except ValueError as e:
+            Logger.error('cannot reshape array of size 0 into shape')
+            return False
+    
+        image = cv2.flip(image, 0)
+        if image is None:
+            Logger.error('Empty image after cv2.flip')
+
+        #cv2.imshow('', image)
+        #cv2.waitKey(0)
+        ADBDevice.s_screenshot = image
+        
     def getScreenshot():
         return ADBDevice.s_screenshot
 
