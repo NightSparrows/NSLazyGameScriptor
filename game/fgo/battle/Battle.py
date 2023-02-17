@@ -41,7 +41,7 @@ class Battle:
         
         # serialize script
         self.m_data = BattleData()
-        self.m_tasks = BattleUtil.SerializeTask(script)
+        self.m_tasks = BattleUtil.SerializeTask(self.m_data, script)
         Logger.info('Implement ' + str(len(self.m_tasks)) + ' tasks.')
 
         self.m_skipChooseParty = False

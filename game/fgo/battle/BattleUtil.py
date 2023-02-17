@@ -1,13 +1,15 @@
 
 from core.Logger import Logger
 
+from .BattleData import BattleData
 from .SkillBattleTask import SkillBattleTask
 from .CardBattleTask import CardBattleTask
+from .JumpBattleTask import JumpBattleTask
 
 class BattleUtil:
 
     # state method for searialize the battle script
-    def SerializeTask(script: str):
+    def SerializeTask(data: BattleData, script: str):
         tasks = list()
 
         scriptLines = script.splitlines()
@@ -28,8 +30,10 @@ class BattleUtil:
                 assert(len(cmdArgs) == 4)
                 task = CardBattleTask([cmdArgs[1], cmdArgs[2], cmdArgs[3]])
                 tasks.append(task)
-            elif cmdArgs[0] == 'restart':
-                raise NotImplementedError()
+            elif cmdArgs[0] == 'jump':
+                assert(len(cmdArgs) >= 2)
+                task = JumpBattleTask(data, int(cmdArgs[1]))
+                tasks.append(task)
             else:
                 Logger.error("Unknown script command.")
 

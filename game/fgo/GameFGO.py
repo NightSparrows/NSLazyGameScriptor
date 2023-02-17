@@ -127,12 +127,12 @@ class GameFGO(Game):
         # TODO 確認是否有友情點數
         while timer <= 3:
             ADBDevice.screenshot()
-            result = ADBDevice.scan_screenshot(Assets.OKBtnImage)
+            result = ADBDevice.scan_screenshot(Assets.CloseBtnImage)
             time.sleep(1)           # scan 到不代表按的到
 
             if (OpenCVUtil.isMatch(result)):
                 Logger.info('有怪怪的視窗，按確定')
-                point = OpenCVUtil.calculated(result, Assets.OKBtnImage.shape)
+                point = OpenCVUtil.calculated(result, Assets.CloseBtnImage.shape)
                 ADBDevice.tap(point['x']['center'], point['y']['center'])
                 time.sleep(1)
                 break
