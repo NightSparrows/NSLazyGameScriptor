@@ -48,7 +48,7 @@ class ADBDevice:
         #ADBDevice.s_screenshot = image
         
         data = pipe.stdout.read()
-        pipe.kill()
+        pipe.terminate()
 
         # See headers in:
         # https://github.com/ClnViewer/Android-fast-screen-capture#streamimage-compressed---header-format-using

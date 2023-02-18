@@ -17,9 +17,15 @@ if __name__ == '__main__':
 
     game = GameFGO()
 
+    game.restart()
+
+    game.m_tasks[0].execute()
+
+    exit()
+
     game.initState()
 
-    game.m_battles['QuickParty'].execute(15)
+    game.m_battles['QuickParty'].execute(20)
 
 
     exit()

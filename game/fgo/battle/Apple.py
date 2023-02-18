@@ -9,6 +9,7 @@ class Apple:
 
     s_appleWindow = cv2.imread('.//assets//fgo//battle//appleWindow.png')
     s_copperAppleImage = cv2.imread('.//assets//fgo//battle//copperApple.png')
+    s_silverAppleImage = cv2.imread('.//assets//fgo//battle//silverApple.png')
     s_OKBtnImage = cv2.imread('.//assets//fgo//battle//ok.png')
 
     def checkAppleWindow():
@@ -28,7 +29,7 @@ class Apple:
     def eatApple():
         ADBDevice.swipe(640, 400, 640, 200)
         time.sleep(1)
-        ADBDevice.tapImage(Apple.s_copperAppleImage)
+        ADBDevice.tapImage(Apple.s_silverAppleImage)
         timer = 0
         Tapped = False
         while timer < 5:
