@@ -17,6 +17,14 @@ if __name__ == '__main__':
 
     game = GameFGO()
 
+    game.initState()
+
+    game.m_battles['ArtParty'].execute(10)
+
+    exit()
+
+    game = GameFGO()
+
     game.restart()
 
     game.m_tasks[0].execute()

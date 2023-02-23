@@ -12,6 +12,8 @@ class OpenCVUtil:
         return {'min_val':min_val, 'max_val':max_val, 'min_loc':min_loc, 'max_loc':max_loc}
 
     def isMatch(result):
+        if result == None:
+            return False
         return result['max_val'] > 0.9
 
     def calculated(result, shape):

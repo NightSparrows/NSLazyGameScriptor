@@ -25,6 +25,7 @@ class Battle:
     s_nextStepBtnImage = cv2.imread('.//assets//fgo//battle//nextStepBtn.png')
     s_endDicisionImage = cv2.imread('.//assets//fgo//battle//endDicision.png')
     s_refreshBtnImage = cv2.imread('.//assets//fgo//battle//refreshBtn.png')
+    s_friendConfirmImage = cv2.imread('.//assets//fgo//battle//friendConfirm.png')
 
     # partyNumber: 1 ~ 10
     def __init__(self, partyNumber: int, friend: str, skill, script: str, prefer: str) -> None:
@@ -98,26 +99,34 @@ class Battle:
 
                     if (self.m_skill[0] == True):
                         Logger.info('Checking skill 1 ... ')
-                        result = OpenCVUtil.match(skillImage, self.m_friendInfo['skill1'])
-                        if (not OpenCVUtil.isMatch(result)):
+                        try:
+                            result = OpenCVUtil.match(skillImage, self.m_friendInfo['skill1'])
+                            if (not OpenCVUtil.isMatch(result)):
+                                foundServant = False
+                            else:
+                                Logger.info('Skill 1 match!')
+                        except:
                             foundServant = False
-                        else:
-                            Logger.info('Skill 1 match!')
                     if (self.m_skill[1] == True):
                         Logger.info('Checking skill 2 ... ')
-                        result = OpenCVUtil.match(skillImage, self.m_friendInfo['skill2'])
-                        if (not OpenCVUtil.isMatch(result)):
-                            foundServant = False    # 不符合找下一個
-                        else:
-                            Logger.info('Skill 2 match!')
+                        try:
+                            result = OpenCVUtil.match(skillImage, self.m_friendInfo['skill2'])
+                            if (not OpenCVUtil.isMatch(result)):
+                                foundServant = False    # 不符合找下一個
+                            else:
+                                Logger.info('Skill 2 match!')
+                        except:
+                            foundServant = False
                     if (self.m_skill[2] == True):
                         Logger.info('Checking skill 3 ... ')
-                        result = OpenCVUtil.match(skillImage, self.m_friendInfo['skill3'])
-                        if (not OpenCVUtil.isMatch(result)):
-                            foundServant = False    # 不符合找下一個
-                        else:
-                            Logger.info('Skill 3 match!')
-                    
+                        try:
+                            result = OpenCVUtil.match(skillImage, self.m_friendInfo['skill3'])
+                            if (not OpenCVUtil.isMatch(result)):
+                                foundServant = False    # 不符合找下一個
+                            else:
+                                Logger.info('Skill 3 match!')
+                        except:
+                            foundServant = False
                     # TODO 禮裝檢查
 
                     # Choose it!
@@ -264,12 +273,33 @@ class Battle:
                     self.m_currentStage = Battle.Stage.End
             elif self.m_currentStage == Battle.Stage.End:  # 戰鬥結束
                 executeCount += 1
+                
+                # TODO 按掉活動視窗
+                Logger.info('確認活動視窗')
+                result = ADBDevice.WaitUntil(Battle.s_nextStepBtnImage, 2)
+                if OpenCVUtil.isMatch(result):
+                    ADBDevice.tap(1110, 647)
+                    time.sleep(1)
+                
+                # TODO 好友申請
+                time.sleep(1)
+                Logger.info('確認好友申請')
+                result = ADBDevice.WaitUntil(Battle.s_friendConfirmImage, 2)
+                if OpenCVUtil.isMatch(result):
+                    #直接拒絕
+                    Logger.info('好友申請，直接拒絕')
+                    ADBDevice.tap(329, 616)
+                    time.sleep(1)
+
                 Logger.info('戰鬥結束，完成第' + str(executeCount) + '次')
                 result = ADBDevice.WaitUntil(Battle.s_endDicisionImage, 5)
                 time.sleep(1)
+
+                
+
                 if result == None:
                     Logger.error('無法找到結束確認視窗')
-                    return False
+                    return False, executeCount
                 else:
                     if (executeCount == count):
                         self.m_endFlags = True
@@ -285,10 +315,10 @@ class Battle:
                         Apple.checkAppleWindow()
             else:
                 Logger.error('Unknown battle stage')
-                return False
+                return False, executeCount
         
         Logger.info('Battle task complete.')
-        return True
+        return True, executeCount
         
 
 

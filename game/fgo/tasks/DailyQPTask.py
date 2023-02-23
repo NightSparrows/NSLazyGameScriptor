@@ -24,6 +24,21 @@ class DailyQPTask(Task):
         self.m_battle = battle
         self.m_executeTime = executeTime
     
+    def pressTaskBtn(self):
+        for i in range(5):
+            ADBDevice.screenshot()
+            result = ADBDevice.scan_screenshot(DailyQPTask.s_QPQuestBtnImage)
+            if result != None:
+                point = OpenCVUtil.calculated(result, DailyQPTask.s_QPQuestBtnImage.shape)
+                ADBDevice.tap(point['x']['center'], point['y']['center'])
+                time.sleep(1)
+                return True
+
+            ADBDevice.holdScroll(1150, 210, 1150, 350, 600)
+            time.sleep(1)
+
+        return False
+
     def execute(self):
         Logger.info('Start executing task: daily QP')
         # goto the daily
@@ -37,25 +52,25 @@ class DailyQPTask(Task):
         time.sleep(1)
 
         #scroll up and search the QP task button and pressed it
-        toBattle = False
-        for i in range(5):
-            ADBDevice.screenshot()
-            result = ADBDevice.scan_screenshot(DailyQPTask.s_QPQuestBtnImage)
-            if result != None:
-                point = OpenCVUtil.calculated(result, DailyQPTask.s_QPQuestBtnImage.shape)
-                ADBDevice.tap(point['x']['center'], point['y']['center'])
-                time.sleep(1)
-                toBattle = True
-                break
-
-            ADBDevice.holdScroll(1150, 210, 1150, 350, 600)
-            time.sleep(1)
+        toBattle = self.pressTaskBtn()
             
         if toBattle:
             Apple.checkAppleWindow()
-            if self.m_battle.execute(self.m_executeTime):
+            result, count = self.m_battle.execute(self.m_executeTime)
+            if result:
                 Logger.info('Daily QP task complete')
                 return True
+            else:
+                self.pressTaskBtn()
+                result, _ = self.m_battle.execute(self.m_executeTime - count)
+                if result:
+                    Logger.info('Daily QP task complete')
+                    return True
+                else:
+                    Logger.error('Failed to complete daily QP task')
+                    return False
+
+
         
         return False
 
